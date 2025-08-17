@@ -1,122 +1,119 @@
 import React, { useState, useEffect } from 'react';
-import { FaEye, FaEyeSlash, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { useSpring, animated } from 'react-spring';
+import { motion } from 'framer-motion';
+import { FaEye, FaEyeSlash, FaArrowUp, FaArrowDown, FaRefresh } from 'react-icons/fa';
+import { usePortfolio } from '../../contexts/PortfolioContext';
+import { useCrypto } from '../../contexts/CryptoContext';
+import { formatCurrency, formatPercentage } from '../../utils/formatters';
 
 const Balance: React.FC = () => {
   const [showBalance, setShowBalance] = useState(true);
-  const [currency, setCurrency] = useState('NGN');
-  const [showBreakdown, setShowBreakdown] = useState(false);
+  const [timeframe, setTimeframe] = useState<'24h' | '7d' | '30d'>('24h');
+  const { portfolio, totalValue, totalChange } = usePortfolio();
+  const { currency, refreshData } = useCrypto();
+  const [refreshing, setRefreshing] = useState(false);
 
-  const cryptoBalances = [
-    { name: 'Bitcoin', amount: 0.5, valueNGN: 9750000 },
-    { name: 'Ethereum', amount: 3.2, valueNGN: 3840000 },
-    { name: 'Litecoin', amount: 15, valueNGN: 675000 },
-    { name: 'Solana', amount: 50, valueNGN: 1250000 },
-  ];
-
-  const totalBalanceNGN = cryptoBalances.reduce((sum, crypto) => sum + crypto.valueNGN, 0);
-
-  const exchangeRates = {
-    NGN: 1,
-    USD: 1 / 1562.50,
-    EUR: 1 / 1701.06,
-    GBP: 1 / 2026.43,
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refreshData();
+    setTimeout(() => setRefreshing(false), 1000);
   };
 
-  const convertCurrency = (amountNGN: number, toCurrency: string) => {
-    return (amountNGN * exchangeRates[toCurrency]).toFixed(2);
-  };
-
-  const [{ height }, heightApi] = useSpring(() => ({
-    height: 192,
-    config: { tension: 300, friction: 30 }
-  }));
-
-  const [mainContentProps, mainContentApi] = useSpring(() => ({
-    opacity: 1,
-    transform: 'translateY(0px) scale(1)'
-  }));
-
-  const [breakdownProps, breakdownApi] = useSpring(() => ({
-    opacity: 0,
-    transform: 'translateY(50px) scale(0.9)'
-  }));
-
-  useEffect(() => {
-    if (showBreakdown) {
-      heightApi.start({ height: 280 });
-      mainContentApi.start({ opacity: 0, transform: 'translateY(-50px) scale(0.9)' });
-      breakdownApi.start({ opacity: 1, transform: 'translateY(0px) scale(1)' });
-    } else {
-      heightApi.start({ height: 192 });
-      mainContentApi.start({ opacity: 1, transform: 'translateY(0px) scale(1)' });
-      breakdownApi.start({ opacity: 0, transform: 'translateY(50px) scale(0.9)' });
-    }
-  }, [showBreakdown, heightApi, mainContentApi, breakdownApi]);
-
-  const toggleBreakdown = () => {
-    setShowBreakdown(!showBreakdown);
-  };
+  const isPositive = totalChange >= 0;
 
   return (
-    <animated.div style={{ height }} className="bg-green-100 rounded-3xl shadow-lg p-6 mb-8 overflow-hidden w-3/4 ml-auto mr-auto relative transition-all duration-300 ease-in-out">
-      {/* SVG Background */}
-      <div className="absolute inset-0">
-        <img src="/src/assets/Balanceshape.svg" alt="Logo" className="w-full h-full object-cover mt-14" />
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="relative overflow-hidden bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-3xl shadow-2xl p-8 text-white"
+    >
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-0 left-0 w-40 h-40 bg-white rounded-full -translate-x-20 -translate-y-20"></div>
+        <div className="absolute bottom-0 right-0 w-60 h-60 bg-white rounded-full translate-x-20 translate-y-20"></div>
       </div>
 
-      <div className="flex justify-between items-center mb-4 relative z-10">
-        <h2 className="text-2xl font-bold">{showBreakdown ? "Balance Breakdown" : "Total Balance"}</h2>
-        <div className="flex items-center space-x-4 ">
-          <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            className="rounded px-2 py-1 bg-green-100"
-          >
-            <option value="NGN">NGN</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="GBP">GBP</option>
-          </select>
-          <button onClick={() => setShowBalance(!showBalance)}>
-            {showBalance ? <FaEye /> : <FaEyeSlash />}
-          </button>
+      <div className="relative z-10">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-lg font-medium opacity-90">Total Portfolio Value</h2>
+            <div className="flex items-center gap-2 mt-1">
+              {(['24h', '7d', '30d'] as const).map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setTimeframe(period)}
+                  className={`px-3 py-1 text-sm rounded-full transition-all ${
+                    timeframe === period
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  {period}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleRefresh}
+              className={`p-2 rounded-full bg-white/10 hover:bg-white/20 transition-all ${
+                refreshing ? 'animate-spin' : ''
+              }`}
+            >
+              <FaRefresh className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setShowBalance(!showBalance)}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20"
+            >
+              {showBalance ? <FaEye className="w-4 h-4" /> : <FaEyeSlash className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Balance Display */}
+        <div className="mb-6">
+          <div className="text-4xl font-bold mb-2">
+            {showBalance ? formatCurrency(totalValue, currency) : '••••••••'}
+          </div>
+          
+          <div className={`flex items-center gap-2 text-lg ${
+            isPositive ? 'text-green-300' : 'text-red-300'
+          }`}>
+            {isPositive ? <FaArrowUp /> : <FaArrowDown />}
+            <span>
+              {showBalance ? formatPercentage(totalChange) : '••••'}
+            </span>
+            <span className="text-white/70 text-sm">({timeframe})</span>
+          </div>
+        </div>
+
+        {/* Portfolio Breakdown */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {portfolio.slice(0, 4).map((asset) => (
+            <motion.div
+              key={asset.id}
+              whileHover={{ scale: 1.05 }}
+              className="bg-white/10 rounded-lg p-3 backdrop-blur"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <img src={asset.image} alt={asset.name} className="w-6 h-6" />
+                <span className="font-medium text-sm">{asset.symbol.toUpperCase()}</span>
+              </div>
+              <div className="text-lg font-semibold">
+                {showBalance ? formatCurrency(asset.value, currency) : '••••'}
+              </div>
+              <div className={`text-xs ${
+                asset.change_24h >= 0 ? 'text-green-300' : 'text-red-300'
+              }`}>
+                {showBalance ? formatPercentage(asset.change_24h) : '••••'}
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
-      <div className="relative h-full z-10">
-        <animated.div style={mainContentProps} className="absolute inset-0">
-          <div className="text-4xl font-bold mb-4">
-            {showBalance ? `${currency} ${Number(convertCurrency(totalBalanceNGN, currency)).toLocaleString()}` : '********'}
-          </div>
-          <button
-            className="text-white flex items-center"
-            onClick={toggleBreakdown}
-          >
-            View Balance <FaChevronRight className="ml-1" />
-          </button>
-        </animated.div>
-        <animated.div style={breakdownProps} className="absolute inset-0 overflow-y-auto">
-          <div className="space-y-2 mb-4">
-            {cryptoBalances.map((crypto) => (
-              <div key={crypto.name} className="flex justify-between">
-                <span>{crypto.name}</span>
-                <span>
-                  {showBalance
-                    ? `${crypto.amount} (${currency} ${Number(convertCurrency(crypto.valueNGN, currency)).toLocaleString()})`
-                    : '********'}
-                </span>
-              </div>
-            ))}
-          </div>
-          <button
-            className="text-white flex items-center mt-4"
-            onClick={toggleBreakdown}
-          >
-            <FaChevronLeft className="mr-1" /> Back to Total
-          </button>
-        </animated.div>
-      </div>
-    </animated.div>
+    </motion.div>
   );
 };
 
