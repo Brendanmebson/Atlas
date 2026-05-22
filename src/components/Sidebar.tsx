@@ -4,14 +4,9 @@ import { useTheme } from '../contexts/ThemeContext';
 import atlasDarkLogo from '../assets/atlas-dark.png';
 
 import {
-  Box,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Typography,
   Badge,
+  Drawer,
 } from '@mui/material';
 import {
   PersonOutline as ProfileIcon,
@@ -42,7 +37,12 @@ const menuItems: MenuItem[] = [
 
 
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  mobileOpen: boolean;
+  onClose: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isDark } = useTheme();
@@ -52,21 +52,18 @@ const Sidebar: React.FC = () => {
     return location.pathname === path;
   };
 
-  return (
-    <Box sx={{
-      width: 240,
-      height: '100vh',
-      bgcolor: 'transparent',
-      borderRight: '1px solid rgba(0,0,0,0.05)',
-      backdropFilter: 'blur(10px)', // Added a subtle blur so the text is easier to read against the background
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    onClose();
+  };
 
+  const drawerContent = (
+    <Box sx={{
+      height: '100%',
+      bgcolor: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       p: 3,
-      position: 'fixed',
-      left: 0,
-      top: 0,
-      zIndex: 1200,
     }}>
       {/* Logo */}
       <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, mb: 3, pl: 1 }}>
@@ -74,9 +71,9 @@ const Sidebar: React.FC = () => {
           component="img"
           src={atlasDarkLogo}
           alt="Atlas Logo"
-          sx={{ height: 49, width: 'auto', mr: 1.5 }}
+          sx={{ height: 40, width: 'auto', mr: 1.5 }}
         />
-        <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary' }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary' }}>
           Atlas
         </Typography>
       </Box>
@@ -86,10 +83,10 @@ const Sidebar: React.FC = () => {
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
             <ListItemButton
-              onClick={() => navigate(item.path)}
+              onClick={() => handleNavigation(item.path)}
               sx={{
                 borderRadius: 2,
-                py: 1.5,
+                py: 1.2,
                 bgcolor: isActive(item.path) ? 'primary.main' : 'transparent',
                 color: isActive(item.path) ? 'white' : 'text.secondary',
                 '&:hover': {
@@ -100,7 +97,7 @@ const Sidebar: React.FC = () => {
               }}
             >
               <ListItemIcon sx={{
-                minWidth: 40,
+                minWidth: 36,
                 color: 'inherit',
               }}>
                 {item.badge ? (
@@ -113,7 +110,7 @@ const Sidebar: React.FC = () => {
                 primary={item.text}
                 primaryTypographyProps={{
                   fontWeight: isActive(item.path) ? 600 : 500,
-                  fontSize: '0.95rem'
+                  fontSize: '0.9rem'
                 }}
               />
               {isActive(item.path) && (
@@ -129,9 +126,56 @@ const Sidebar: React.FC = () => {
           </ListItem>
         ))}
       </List>
-
-
     </Box>
+  );
+
+  return (
+    <>
+      <Box
+        component="nav"
+        sx={{ width: { md: 240 }, flexShrink: { md: 0 } }}
+      >
+        {/* Mobile Drawer */}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={onClose}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': { 
+              boxSizing: 'border-box', 
+              width: 240,
+              bgcolor: 'background.default',
+              backgroundImage: 'none',
+              borderRight: '1px solid rgba(0,0,0,0.05)',
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+
+        {/* Desktop Sidebar (Permanent) */}
+        <Box
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            width: 240,
+            height: '100vh',
+            position: 'fixed',
+            left: 0,
+            top: 0,
+            borderRight: '1px solid rgba(0,0,0,0.05)',
+            bgcolor: 'transparent',
+            backdropFilter: 'blur(10px)',
+            zIndex: 1100,
+          }}
+        >
+          {drawerContent}
+        </Box>
+      </Box>
+    </>
   );
 };
 

@@ -52,11 +52,7 @@ const Dashboard: React.FC = () => {
                     flexDirection: { xs: 'column', md: 'row' }, 
                     gap: 3, 
                     mt: 1,
-                    width: { 
-                        xs: '100%', 
-                        lg: 'calc(100% + 360px + 24px)',
-                        xl: 'calc(100% + 380px + 24px)'
-                    },
+                    width: '100%',
                     zIndex: 10,
                     position: 'relative'
                 }}>
@@ -68,11 +64,7 @@ const Dashboard: React.FC = () => {
                     </Box>
                 </Box>
                 <Box sx={{ 
-                    width: { 
-                        xs: '100%', 
-                        lg: 'calc(100% + 360px + 24px)',
-                        xl: 'calc(100% + 380px + 24px)'
-                    },
+                    width: '100%',
                     zIndex: 10,
                     position: 'relative'
                 }}>

@@ -18,8 +18,15 @@ import './styles/animations.css';
 
 import bgImage from './assets/background.jpg';
 import Sidebar from './components/Sidebar';
+import Navbar from './components/Header/Navbar';
 
 const App: React.FC = () => {
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   return (
     <ThemeProvider>
       <CryptoProvider>
@@ -42,12 +49,15 @@ const App: React.FC = () => {
               zIndex: 0,
             }
           }}>
-            <Sidebar />
+            <Navbar onMenuClick={handleDrawerToggle} />
+            <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+            
             <Box component="main" sx={{
               flexGrow: 1,
-              ml: '240px',
+              ml: { xs: 0, md: '240px' },
+              mt: { xs: '64px', md: 0 },
               minHeight: '100vh',
-              p: 2.5,
+              p: { xs: 2, md: 2.5 },
               overflow: 'hidden',
               position: 'relative',
               zIndex: 1,
