@@ -12,7 +12,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('cryptodash-theme');
+    const saved = localStorage.getItem('atlas-theme');
     return (saved as Theme) || 'system';
   });
 
@@ -33,7 +33,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     updateTheme();
-    localStorage.setItem('cryptodash-theme', theme);
+    localStorage.setItem('atlas-theme', theme);
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     if (theme === 'system') {

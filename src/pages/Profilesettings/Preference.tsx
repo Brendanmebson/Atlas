@@ -1,72 +1,76 @@
 import React from 'react';
-import { FaCheckCircle, FaDollarSign, FaWallet, FaGlobe, FaBell, FaChevronRight } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import {
+  Box,
+  Typography,
+  Stack,
+  alpha,
+  useTheme as useMuiTheme,
+} from '@mui/material';
+import {
+  CheckCircle as CheckCircleIcon,
+  AttachMoney as MoneyIcon,
+  AccountBalanceWallet as WalletIcon,
+  Language as GlobeIcon,
+  Notifications as BellIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
 
 const Preferences: React.FC = () => {
+  const muiTheme = useMuiTheme();
+
+  const settings = [
+    { icon: <CheckCircleIcon />, title: 'Verification', description: 'Verify your identity to increase limits', color: '#00ffa3' },
+    { icon: <MoneyIcon />, title: 'Currency', description: 'Change your primary currency from NGN', color: '#3B82F6' },
+    { icon: <WalletIcon />, title: 'Accounts', description: 'Add and remove bank accounts', color: '#8B5CF6' },
+    { icon: <GlobeIcon />, title: 'Language', description: 'Set your preferred language', color: '#F7931A' },
+    { icon: <BellIcon />, title: 'Notifications', description: 'Manage your notification settings', color: '#E91E63' },
+  ];
+
   return (
-    <div className="container mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Preference</h2>
-
-          <div className="space-y-6">
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaCheckCircle className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Verification</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Verify your identity to increase limits</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaDollarSign className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Currency</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Change your primary currency from NGN</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaWallet className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Accounts</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Add and remove bank accounts</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaGlobe className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Language</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Set your preferred language</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaBell className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Notifications</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Manage your notification settings</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      <Typography variant="h6" sx={{ fontWeight: 800, mb: 4 }}>App Preferences</Typography>
+      <Stack spacing={2}>
+        {settings.map((item) => (
+          <Box
+            key={item.title}
+            sx={{
+              p: 2.5,
+              borderRadius: 4,
+              cursor: 'pointer',
+              bgcolor: 'white',
+              border: '1px solid rgba(0,0,0,0.04)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.05)',
+                borderColor: alpha(item.color, 0.2),
+                bgcolor: alpha(item.color, 0.01)
+              }
+            }}
+          >
+            <Box sx={{ 
+                p: 1.5, 
+                borderRadius: 2.5, 
+                bgcolor: alpha(item.color, 0.1), 
+                color: item.color,
+                mr: 3,
+                display: 'flex'
+            }}>
+              {React.cloneElement(item.icon as React.ReactElement, { fontSize: 'medium' })}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{item.title}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>{item.description}</Typography>
+            </Box>
+            <ChevronRightIcon sx={{ color: 'text.disabled' }} />
+          </Box>
+        ))}
+      </Stack>
+    </motion.div>
   );
 };
 

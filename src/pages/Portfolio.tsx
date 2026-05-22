@@ -1,6 +1,32 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaArrowUp, FaArrowDown, FaEye, FaEyeSlash, FaPieChart, FaList } from 'react-icons/fa';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Avatar,
+  alpha,
+  useTheme as useMuiTheme,
+} from '@mui/material';
+import {
+  Visibility as EyeIcon,
+  VisibilityOff as EyeSlashIcon,
+  PieChart as PieChartIcon,
+  List as ListIcon,
+  ArrowUpward as ArrowUpIcon,
+  ArrowDownward as ArrowDownIcon,
+} from '@mui/icons-material';
 import { usePortfolio } from '../contexts/PortfolioContext';
 import { useCrypto } from '../contexts/CryptoContext';
 import { formatCurrency, formatPercentage } from '../utils/formatters';
@@ -11,13 +37,14 @@ const Portfolio: React.FC = () => {
   const { currency } = useCrypto();
   const [showValues, setShowValues] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const muiTheme = useMuiTheme();
 
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#F97316'];
+  const COLORS = ['#00ffa3', '#9945FF', '#00C2FF', '#FF5252', '#F7931A', '#E91E63'];
 
   const chartData = portfolio.map(asset => ({
     name: asset.symbol.toUpperCase(),
     value: asset.value,
-    percentage: (asset.value / totalValue) * 100
+    percentage: totalValue > 0 ? (asset.value / totalValue) * 100 : 0
   }));
 
   const performanceData = portfolio.map(asset => ({
@@ -27,243 +54,324 @@ const Portfolio: React.FC = () => {
   }));
 
   return (
-    <div className="space-y-6">
+    <Stack spacing={4} sx={{ mt: 1 }}>
       {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Portfolio</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Track your crypto investments and performance
-          </p>
-        </div>
+      <Stack
+        direction={{ xs: 'column', lg: 'row' }}
+        justifyContent="space-between"
+        alignItems={{ xs: 'flex-start', lg: 'center' }}
+        spacing={2}
+      >
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 800, letterSpacing: '-0.02em', mb: 0.5 }}>Portfolio</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+            Manage your assets and track your performance
+          </Typography>
+        </Box>
 
-        <div className="flex items-center gap-3">
-          <button
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <IconButton
             onClick={() => setShowValues(!showValues)}
-            className="p-2 rounded-lg bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+            sx={{ 
+                bgcolor: 'white', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                border: '1px solid rgba(0,0,0,0.03)',
+                p: 1.2
+            }}
           >
-            {showValues ? <FaEye className="w-4 h-4" /> : <FaEyeSlash className="w-4 h-4" />}
-          </button>
+            {showValues ? <EyeIcon sx={{ fontSize: 20 }} /> : <EyeSlashIcon sx={{ fontSize: 20 }} />}
+          </IconButton>
 
-          <div className="flex bg-gray-100 dark:bg-slate-700 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-md transition-colors ${
-                viewMode === 'grid'
-                  ? 'bg-white dark:bg-slate-600 shadow-sm'
-                  : 'hover:bg-gray-200 dark:hover:bg-slate-600'
-              }`}
-            >
-              <FaPieChart className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 rounded-md transition-colors ${
-                viewMode === 'list'
-                  ? 'bg-white dark:bg-slate-600 shadow-sm'
-                  : 'hover:bg-gray-200 dark:hover:bg-slate-600'
-              }`}
-            >
-              <FaList className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
+          <ToggleButtonGroup
+            value={viewMode}
+            exclusive
+            onChange={(_e, v) => v && setViewMode(v)}
+            size="small"
+            sx={{
+              bgcolor: 'white',
+              p: '4px',
+              borderRadius: 3,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              border: '1px solid rgba(0,0,0,0.03)',
+              '& .MuiToggleButton-root': {
+                border: 'none',
+                borderRadius: 2,
+                px: 2,
+                '&.Mui-selected': { 
+                    bgcolor: 'primary.main', 
+                    color: 'white',
+                    '&:hover': { bgcolor: 'primary.dark' }
+                },
+              },
+            }}
+          >
+            <ToggleButton value="grid">
+              <PieChartIcon sx={{ fontSize: 18 }} />
+            </ToggleButton>
+            <ToggleButton value="list">
+              <ListIcon sx={{ fontSize: 18 }} />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
+      </Stack>
 
       {/* Portfolio Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white"
-        >
-          <h3 className="text-lg font-medium opacity-90 mb-2">Total Portfolio Value</h3>
-          <div className="text-3xl font-bold mb-2">
-            {showValues ? formatCurrency(totalValue, currency) : '••••••••'}
-          </div>
-          <div className={`flex items-center gap-2 ${totalPnL >= 0 ? 'text-green-300' : 'text-red-300'}`}>
-            {totalPnL >= 0 ? <FaArrowUp /> : <FaArrowDown />}
-            <span>{showValues ? formatCurrency(Math.abs(totalPnL), currency) : '••••'}</span>
-          </div>
-        </motion.div>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+        <Box sx={{ flex: { xs: '100%', md: 'calc(33.33% - 16px)' } }}>
+          <Card
+            component={motion.div}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            sx={{
+              bgcolor: 'white',
+              borderRadius: 5,
+              border: '1px solid rgba(0,0,0,0.04)',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.02)',
+              height: '100%',
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0, left: 0, right: 0, height: '4px',
+                  bgcolor: 'primary.main'
+              }
+            }}
+          >
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Total Portfolio Value
+              </Typography>
+              <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em', mt: 1 }}>
+                {showValues ? formatCurrency(totalValue, currency) : '••••••••'}
+              </Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 0.5, 
+                    px: 1, 
+                    py: 0.2, 
+                    borderRadius: 1.5, 
+                    bgcolor: alpha(totalPnL >= 0 ? '#00ffa3' : '#ff5252', 0.1) 
+                }}>
+                    {totalPnL >= 0 ? <ArrowUpIcon sx={{ fontSize: 14, color: '#00b372' }} /> : <ArrowDownIcon sx={{ fontSize: 14, color: '#f44336' }} />}
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: totalPnL >= 0 ? '#00b372' : '#f44336' }}>
+                    {showValues ? formatCurrency(Math.abs(totalPnL), currency) : '••••'}
+                    </Typography>
+                </Box>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>Total Profit</Typography>
+              </Stack>
+            </CardContent>
+          </Card>
+        </Box>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl"
-        >
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">24h Change</h3>
-          <div className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
-            {showValues ? formatPercentage(2.45) : '••••'}
-          </div>
-          <div className="text-green-500">
-            +{showValues ? formatCurrency(1250, currency) : '••••'}
-          </div>
-        </motion.div>
+        <Box sx={{ flex: { xs: '100%', md: 'calc(33.33% - 16px)' } }}>
+          <Card
+            component={motion.div}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            sx={{ borderRadius: 5, border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 10px 40px rgba(0,0,0,0.02)', height: '100%', bgcolor: 'white' }}
+          >
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                24h Change
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, mt: 1 }}>
+                {showValues ? formatPercentage(2.45) : '••••'}
+              </Typography>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'success.main' }}>
+                +{showValues ? formatCurrency(1250, currency) : '••••'}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl"
-        >
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Assets</h3>
-          <div className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
-            {portfolio.length}
-          </div>
-          <div className="text-gray-500 dark:text-gray-400">
-            {transactions.length} total transactions
-          </div>
-        </motion.div>
-      </div>
+        <Box sx={{ flex: { xs: '100%', md: 'calc(33.33% - 16px)' } }}>
+          <Card
+            component={motion.div}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            sx={{ borderRadius: 5, border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 10px 40px rgba(0,0,0,0.02)', height: '100%', bgcolor: 'white' }}
+          >
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Asset Count
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 800, mb: 1, mt: 1 }}>
+                {portfolio.length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                Across {transactions.length} transactions
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
 
       {/* Charts and Assets */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Portfolio Allocation Chart */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl"
-        >
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Portfolio Allocation</h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  dataKey="value"
-                >
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => formatCurrency(value, currency)} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="grid grid-cols-2 gap-2 mt-4">
-            {chartData.map((asset, index) => (
-              <div key={asset.name} className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                />
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {asset.name} ({asset.percentage.toFixed(1)}%)
-                </span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+        <Box sx={{ flex: { xs: '100%', lg: 'calc(50% - 12px)' } }}>
+          <Card sx={{ borderRadius: 5, border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 8px 32px rgba(0,0,0,0.02)', height: '100%', bgcolor: 'white' }}>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 4 }}>Asset Allocation</Typography>
+              <Box sx={{ height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={chartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={70}
+                      outerRadius={105}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {chartData.map((_entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: 'none', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}
+                      itemStyle={{ fontWeight: 700 }}
+                      formatter={(value: number) => formatCurrency(value, currency)} 
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Box>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mt: 3 }}>
+                {chartData.map((asset, index) => (
+                  <Box key={asset.name} sx={{ px: 1.5, py: 0.8, borderRadius: 2, bgcolor: alpha(COLORS[index % COLORS.length], 0.05) }}>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: COLORS[index % COLORS.length] }} />
+                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                        {asset.name} <Box component="span" sx={{ color: 'text.secondary', fontWeight: 500 }}>{asset.percentage.toFixed(1)}%</Box>
+                      </Typography>
+                    </Stack>
+                  </Box>
+                ))}
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
 
-        {/* Performance Chart */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl"
-        >
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Performance</h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={performanceData}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip 
-                  formatter={(value: number) => [
-                    `${value.toFixed(2)}%`,
-                    'P&L %'
-                  ]}
-                />
-                <Bar dataKey="pnlPercentage" fill="#3B82F6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
-      </div>
+        <Box sx={{ flex: { xs: '100%', lg: 'calc(50% - 12px)' } }}>
+          <Card sx={{ borderRadius: 5, border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 8px 32px rgba(0,0,0,0.02)', height: '100%', bgcolor: 'white' }}>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 4 }}>Performance Highlights</Typography>
+              <Box sx={{ height: 300 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={performanceData}>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700 }} stroke={muiTheme.palette.text.secondary} />
+                    <YAxis hide />
+                    <Tooltip
+                      cursor={{ fill: alpha(muiTheme.palette.primary.main, 0.05) }}
+                      contentStyle={{ backgroundColor: '#fff', border: 'none', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.1)' }}
+                      formatter={(value: number) => [`${value.toFixed(2)}%`, 'Profit/Loss']}
+                    />
+                    <Bar 
+                        dataKey="pnlPercentage" 
+                        radius={[6, 6, 0, 0]}
+                        fill={muiTheme.palette.primary.main}
+                    >
+                        {performanceData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.pnlPercentage >= 0 ? '#00ffa3' : '#ff5252'} />
+                        ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
 
-      {/* Assets List */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden"
-      >
-        <div className="p-6 border-b border-gray-200 dark:border-slate-700">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Your Assets</h3>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-slate-700">
-              <tr>
-                <th className="text-left py-3 px-6 text-sm font-medium text-gray-600 dark:text-gray-400">Asset</th>
-                <th className="text-right py-3 px-6 text-sm font-medium text-gray-600 dark:text-gray-400">Holdings</th>
-                <th className="text-right py-3 px-6 text-sm font-medium text-gray-600 dark:text-gray-400">Value</th>
-                <th className="text-right py-3 px-6 text-sm font-medium text-gray-600 dark:text-gray-400">24h Change</th>
-                <th className="text-right py-3 px-6 text-sm font-medium text-gray-600 dark:text-gray-400">P&L</th>
-              </tr>
-            </thead>
-            <tbody>
+      {/* Assets Table */}
+      <Card sx={{ borderRadius: 5, border: '1px solid rgba(0,0,0,0.04)', boxShadow: '0 10px 40px rgba(0,0,0,0.02)', overflow: 'hidden', bgcolor: 'white' }}>
+        <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h6" sx={{ fontWeight: 800 }}>Manage Assets</Typography>
+        </Box>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ bgcolor: alpha('#000', 0.02) }}>
+                <TableCell sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>Asset</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>Holdings</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>Value</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>24h Change</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>Profit / Loss</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {portfolio.map((asset, index) => (
-                <motion.tr
+                <TableRow
                   key={asset.id}
-                  initial={{ opacity: 0, x: -20 }}
+                  component={motion.tr}
+                  initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="border-b border-gray-100 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                  transition={{ delay: index * 0.04 }}
+                  sx={{ 
+                      '&:hover': { bgcolor: alpha(muiTheme.palette.primary.main, 0.02) },
+                      '& .MuiTableCell-root': { borderBottom: '1px solid rgba(0,0,0,0.02)', py: 2.5 }
+                  }}
                 >
-                  <td className="py-4 px-6">
-                    <div className="flex items-center space-x-3">
-                      <img src={asset.image} alt={asset.name} className="w-10 h-10" />
-                      <div>
-                        <div className="font-medium text-gray-900 dark:text-white">{asset.name}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {asset.symbol.toUpperCase()}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="text-right py-4 px-6">
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      {showValues ? asset.amount.toFixed(6) : '••••••'}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                  <TableCell>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Avatar 
+                        src={asset.image} 
+                        alt={asset.name} 
+                        sx={{ 
+                            width: 36, 
+                            height: 36, 
+                            bgcolor: 'white',
+                            border: '1px solid rgba(0,0,0,0.05)',
+                            p: 0.5
+                        }} 
+                      />
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 800 }}>{asset.name}</Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>{asset.symbol.toUpperCase()}</Typography>
+                      </Box>
+                    </Stack>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                      {showValues ? asset.amount.toFixed(4) : '••••'}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                       Avg: {showValues ? formatCurrency(asset.avgBuyPrice, currency) : '••••'}
-                    </div>
-                  </td>
-                  <td className="text-right py-4 px-6 font-medium text-gray-900 dark:text-white">
-                    {showValues ? formatCurrency(asset.value, currency) : '••••••'}
-                  </td>
-                  <td className={`text-right py-4 px-6 font-medium ${
-                    asset.change_24h >= 0 ? 'text-green-500' : 'text-red-500'
-                  }`}>
-                    <div className="flex items-center justify-end space-x-1">
-                      {asset.change_24h >= 0 ? 
-                        <FaArrowUp className="w-3 h-3" /> : 
-                        <FaArrowDown className="w-3 h-3" />
-                      }
-                      <span>{showValues ? formatPercentage(asset.change_24h) : '••••'}</span>
-                    </div>
-                  </td>
-                  <td className={`text-right py-4 px-6 font-medium ${
-                    asset.pnl >= 0 ? 'text-green-500' : 'text-red-500'
-                  }`}>
-                    <div>{showValues ? formatCurrency(asset.pnl, currency) : '••••••'}</div>
-                    <div className="text-sm">
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="body2" sx={{ fontWeight: 800 }}>
+                      {showValues ? formatCurrency(asset.value, currency) : '••••'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.3, borderRadius: 1.5, bgcolor: alpha(asset.change_24h >= 0 ? '#00ffa3' : '#ff5252', 0.1) }}>
+                      {asset.change_24h >= 0 ? <ArrowUpIcon sx={{ fontSize: 12, color: '#00b372' }} /> : <ArrowDownIcon sx={{ fontSize: 12, color: '#f44336' }} />}
+                      <Typography variant="caption" sx={{ color: asset.change_24h >= 0 ? '#00b372' : '#f44336', fontWeight: 800 }}>
+                        {showValues ? formatPercentage(asset.change_24h) : '••••'}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="body2" sx={{ color: asset.pnl >= 0 ? 'success.main' : 'error.main', fontWeight: 800 }}>
+                      {showValues ? (asset.pnl >= 0 ? '+' : '') + formatCurrency(asset.pnl, currency) : '••••'}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: asset.pnl >= 0 ? 'success.main' : 'error.main', fontWeight: 600 }}>
                       {showValues ? formatPercentage(asset.pnlPercentage) : '••••'}
-                    </div>
-                  </td>
-                </motion.tr>
+                    </Typography>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </motion.div>
-    </div>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Card>
+    </Stack>
   );
 };
 

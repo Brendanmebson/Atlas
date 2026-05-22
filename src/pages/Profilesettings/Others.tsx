@@ -1,61 +1,74 @@
 import React from 'react';
-import { FaQuestionCircle, FaInfoCircle, FaSignOutAlt, FaTrashAlt, FaChevronRight } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import {
+  Box,
+  Typography,
+  Stack,
+  alpha,
+  useTheme as useMuiTheme,
+} from '@mui/material';
+import {
+  HelpOutline as HelpIcon,
+  InfoOutlined as InfoIcon,
+  Logout as LogoutIcon,
+  DeleteForever as DeleteIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
 
 const Others: React.FC = () => {
+  const muiTheme = useMuiTheme();
+
+  const settings = [
+    { icon: <HelpIcon />, title: 'Help & Support', description: 'Get assistance with your account', color: '#3B82F6' },
+    { icon: <InfoIcon />, title: 'About Atlas', description: 'Learn more about the platform', color: '#8B5CF6' },
+    { icon: <LogoutIcon />, title: 'Logout', description: 'Sign out from your account', color: '#F7931A' },
+    { icon: <DeleteIcon />, title: 'Delete Account', description: 'Permanently delete your account', color: '#ff5252' },
+  ];
+
   return (
-    <div className="container mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Other Settings</h2>
-
-          <div className="space-y-6">
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaQuestionCircle className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Help & Support</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Get assistance with your account</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaInfoCircle className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">About DKoge</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Learn more about DKoge</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaSignOutAlt className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Logout</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Sign out from your account</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaTrashAlt className="text-2xl text-red-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg  text-red-600 font-semibold group-hover:text-white">Delete Account</h3>
-                  <p className="text-sm text-red-600 group-hover:text-white">Permanently delete your account</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      <Typography variant="h6" sx={{ fontWeight: 800, mb: 4 }}>Other Settings</Typography>
+      <Stack spacing={2}>
+        {settings.map((item) => (
+          <Box
+            key={item.title}
+            sx={{
+              p: 2.5,
+              borderRadius: 4,
+              cursor: 'pointer',
+              bgcolor: 'white',
+              border: '1px solid rgba(0,0,0,0.04)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.05)',
+                borderColor: alpha(item.color, 0.2),
+                bgcolor: alpha(item.color, 0.01)
+              }
+            }}
+          >
+            <Box sx={{ 
+                p: 1.5, 
+                borderRadius: 2.5, 
+                bgcolor: alpha(item.color, 0.1), 
+                color: item.color,
+                mr: 3,
+                display: 'flex'
+            }}>
+              {React.cloneElement(item.icon as React.ReactElement, { fontSize: 'medium' })}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{item.title}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>{item.description}</Typography>
+            </Box>
+            <ChevronRightIcon sx={{ color: 'text.disabled' }} />
+          </Box>
+        ))}
+      </Stack>
+    </motion.div>
   );
 };
 

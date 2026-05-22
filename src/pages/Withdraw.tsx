@@ -1,5 +1,17 @@
-// src/components/Withdraw.tsx
 import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  TextField,
+  MenuItem,
+  Button,
+  Stack,
+  alpha,
+  InputAdornment,
+  Divider,
+} from '@mui/material';
 
 const Withdraw: React.FC = () => {
   const cryptoBalances = [
@@ -9,7 +21,7 @@ const Withdraw: React.FC = () => {
     { name: 'Solana', amount: 50, valueNGN: 1250000 },
   ];
 
-  const exchangeRates = {
+  const exchangeRates: Record<string, number> = {
     NGN: 1,
     USD: 1 / 1562.50,
     EUR: 1 / 1701.06,
@@ -18,7 +30,7 @@ const Withdraw: React.FC = () => {
 
   const [selectedCrypto, setSelectedCrypto] = useState(cryptoBalances[0].name);
   const [currency, setCurrency] = useState('NGN');
-  const [withdrawType, setWithdrawType] = useState('Crypto');
+  const [withdrawType, setWithdrawType] = useState<'Crypto' | 'Fiat'>('Crypto');
   const [amount, setAmount] = useState('');
   const [address, setAddress] = useState('');
   const [note, setNote] = useState('');
@@ -26,19 +38,19 @@ const Withdraw: React.FC = () => {
   const selectedCryptoData = cryptoBalances.find(crypto => crypto.name === selectedCrypto);
   const selectedCurrencyRate = exchangeRates[currency];
   
-  const getConvertedValue = (valueNGN: number) => (valueNGN * selectedCurrencyRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const getConvertedValue = (valueNGN: number) => 
+    (valueNGN * selectedCurrencyRate).toLocaleString(undefined, { 
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2 
+    });
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const numericValue = parseFloat(value);
 
     if (!isNaN(numericValue) && numericValue >= 0) {
-      if (withdrawType === 'Crypto' && selectedCryptoData && numericValue <= selectedCryptoData.amount) {
+      if (selectedCryptoData) {
         setAmount(value);
-      } else if (withdrawType === 'Fiat' && selectedCryptoData && numericValue <= getConvertedValue(selectedCryptoData.valueNGN)) {
-        setAmount(value);
-      } else if (numericValue > selectedCryptoData.amount) {
-        setAmount(selectedCryptoData.amount.toString());
       }
     } else if (value === '') {
       setAmount('');
@@ -46,96 +58,136 @@ const Withdraw: React.FC = () => {
   };
 
   const handleWithdraw = () => {
-    // Add withdrawal logic here
     alert(`Withdraw ${amount} ${withdrawType === 'Crypto' ? selectedCrypto : currency} to ${address} with note: ${note}`);
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 max-w-md mx-auto mt-10">
-      <h2 className="text-2xl font-semibold text-green-600 mb-6">Withdraw Funds</h2>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Select Cryptocurrency</label>
-        <select
-          value={selectedCrypto}
-          onChange={(e) => setSelectedCrypto(e.target.value)}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        >
-          {cryptoBalances.map(crypto => (
-            <option key={crypto.name} value={crypto.name}>{crypto.name}</option>
-          ))}
-        </select>
-      </div>
-      {selectedCryptoData && (
-        <div className="mb-4">
-          <p className="text-gray-700 text-sm font-bold mb-2">
-            Balance: {selectedCryptoData.amount} {selectedCrypto} ({getConvertedValue(selectedCryptoData.valueNGN)} {currency})
-          </p>
-        </div>
-      )}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Currency</label>
-        <select
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-          className="rounded px-2 py-1 bg-green-100"
-        >
-          <option value="NGN">NGN</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-          <option value="GBP">GBP</option>
-        </select>
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Withdraw Type</label>
-        <select
-          value={withdrawType}
-          onChange={(e) => setWithdrawType(e.target.value)}
-          className="rounded px-2 py-1 bg-green-100"
-        >
-          <option value="Crypto">Crypto</option>
-          <option value="Fiat">Fiat</option>
-        </select>
-      </div>
-      <div className="mb-4 relative">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Amount</label>
-        <input
-          type="text"
-          value={amount}
-          onChange={handleAmountChange}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Enter amount to withdraw"
-        />
-        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-          {withdrawType === 'Crypto' ? `${amount} ${selectedCrypto}` : `${getConvertedValue(parseFloat(amount) || 0)} ${currency}`}
-        </span>
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Crypto Address</label>
-        <input
-          type="text"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Enter your crypto address"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">Note (optional)</label>
-        <input
-          type="text"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Enter a note"
-        />
-      </div>
-      <button
-        onClick={handleWithdraw}
-        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full transition duration-200"
-      >
-        Withdraw
-      </button>
-    </div>
+    <Box sx={{ maxWidth: 500, mx: 'auto', mt: 4 }}>
+      <Card sx={{ borderRadius: 4, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+        <CardContent sx={{ p: 4 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: 'success.main', mb: 4 }}>
+            Withdraw Funds
+          </Typography>
+          
+          <Stack spacing={3}>
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Select Cryptocurrency</Typography>
+              <TextField
+                select
+                fullWidth
+                value={selectedCrypto}
+                onChange={(e) => setSelectedCrypto(e.target.value)}
+              >
+                {cryptoBalances.map(crypto => (
+                  <MenuItem key={crypto.name} value={crypto.name}>{crypto.name}</MenuItem>
+                ))}
+              </TextField>
+            </Box>
+
+            {selectedCryptoData && (
+              <Box sx={{ p: 2, bgcolor: alpha('#4caf50', 0.05), borderRadius: 2, border: '1px dashed', borderColor: 'success.main' }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
+                  Available Balance: {selectedCryptoData.amount} {selectedCrypto}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Estimated Value: {getConvertedValue(selectedCryptoData.valueNGN)} {currency}
+                </Typography>
+              </Box>
+            )}
+
+            <Divider />
+
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Currency</Typography>
+                <TextField
+                  select
+                  fullWidth
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                >
+                  <MenuItem value="NGN">NGN</MenuItem>
+                  <MenuItem value="USD">USD</MenuItem>
+                  <MenuItem value="EUR">EUR</MenuItem>
+                  <MenuItem value="GBP">GBP</MenuItem>
+                </TextField>
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Type</Typography>
+                <TextField
+                  select
+                  fullWidth
+                  value={withdrawType}
+                  onChange={(e) => setWithdrawType(e.target.value as 'Crypto' | 'Fiat')}
+                >
+                  <MenuItem value="Crypto">Crypto</MenuItem>
+                  <MenuItem value="Fiat">Fiat</MenuItem>
+                </TextField>
+              </Box>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Amount</Typography>
+              <TextField
+                fullWidth
+                type="number"
+                value={amount}
+                onChange={handleAmountChange}
+                placeholder="0.00"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Typography variant="body2" fontWeight={600}>
+                        {withdrawType === 'Crypto' ? selectedCrypto : currency}
+                      </Typography>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Receiving Address</Typography>
+              <TextField
+                fullWidth
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Enter wallet address"
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>Note (Optional)</Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={2}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="What's this withdrawal for?"
+              />
+            </Box>
+
+            <Button
+              fullWidth
+              variant="contained"
+              color="success"
+              size="large"
+              onClick={handleWithdraw}
+              sx={{
+                py: 1.5,
+                borderRadius: 3,
+                fontWeight: 700,
+                textTransform: 'none',
+                boxShadow: '0 8px 16px rgba(76, 175, 80, 0.24)',
+              }}
+            >
+              Confirm Withdrawal
+            </Button>
+          </Stack>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

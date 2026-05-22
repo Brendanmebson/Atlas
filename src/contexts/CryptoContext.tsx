@@ -32,6 +32,7 @@ interface CryptoContextType {
   getTrendingCoins: () => CryptoCoin[];
   getTopGainers: () => CryptoCoin[];
   getTopLosers: () => CryptoCoin[];
+  lastUpdated: Date | null;
 }
 
 const CryptoContext = createContext<CryptoContextType | undefined>(undefined);
@@ -41,13 +42,18 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currency, setCurrency] = useState('usd');
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchCoins = async () => {
     try {
-      setLoading(true);
+      // Only show loading spinner on initial fetch (when coins list is empty)
+      if (coins.length === 0) {
+        setLoading(true);
+      }
       setError(null);
       const data = await cryptoService.getMarketData(currency);
       setCoins(data);
+      setLastUpdated(new Date());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch crypto data');
     } finally {
@@ -88,8 +94,6 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   useEffect(() => {
     fetchCoins();
-    const interval = setInterval(fetchCoins, 60000); // Refresh every minute
-    return () => clearInterval(interval);
   }, [currency]);
 
   return (
@@ -103,7 +107,8 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       searchCoins,
       getTrendingCoins,
       getTopGainers,
-      getTopLosers
+      getTopLosers,
+      lastUpdated
     }}>
       {children}
     </CryptoContext.Provider>

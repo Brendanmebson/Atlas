@@ -1,45 +1,90 @@
-// components/Transactions.tsx
 import React from 'react';
-import { FaArrowRight, FaArrowLeft, FaExchangeAlt } from 'react-icons/fa';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Avatar,
+  alpha,
+} from '@mui/material';
+import {
+  ArrowDownward as ArrowDownIcon,
+  ArrowUpward as ArrowUpIcon,
+  SwapHoriz as SwapIcon,
+} from '@mui/icons-material';
 
 const transactions = [
-  { id: 1, type: 'buy', crypto: 'Bitcoin', amount: 0.5, price: 45000, date: '2023-07-10' },
-  { id: 2, type: 'sell', crypto: 'Ethereum', amount: 2, price: 3000, date: '2023-07-09' },
+  { id: 1, type: 'buy', crypto: 'Bitcoin', symbol: 'BTC', amount: 0.5, price: 45000, date: '2023-07-10' },
+  { id: 2, type: 'sell', crypto: 'Ethereum', symbol: 'ETH', amount: 2, price: 3000, date: '2023-07-09' },
   { id: 3, type: 'swap', from: 'Litecoin', to: 'Cardano', amount: 10, date: '2023-07-08' },
 ];
 
 const Transactions: React.FC = () => {
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 ml-auto mr-auto">
-      <h3 className="text-xl font-bold mb-4">Recent Transactions</h3>
-      <div className="space-y-4">
-        {transactions.map((transaction) => (
-          <div key={transaction.id} className="flex items-center justify-between border-b-2 pb-2">
-            <div className="flex items-center">
-              {transaction.type === 'buy' && <FaArrowRight className="text-green-500 mr-2" />}
-              {transaction.type === 'sell' && <FaArrowLeft className="text-red-500 mr-2" />}
-              {transaction.type === 'swap' && <FaExchangeAlt className="text-blue-500 mr-2" />}
-              <div>
-                <div className="font-medium">
-                  {transaction.type === 'swap'
-                    ? `Swap ${transaction.from} to ${transaction.to}`
-                    : `${transaction.type === 'buy' ? 'Bought' : 'Sold'} ${transaction.crypto}`}
-                </div>
-                <div className="text-sm text-gray-500">{transaction.date}</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="font-medium">
-                {transaction.type !== 'swap' && `${transaction.amount} ${transaction.crypto}`}
-              </div>
-              <div className="text-sm text-gray-500">
-                {transaction.type !== 'swap' && `$${(transaction.amount * transaction.price).toLocaleString()}`}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <Card sx={{ borderRadius: 4, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', bgcolor: 'background.paper' }}>
+      <CardContent sx={{ p: 3 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
+          Recent Transactions
+        </Typography>
+        <List disablePadding>
+          {transactions.map((transaction, index) => (
+            <ListItem
+              key={transaction.id}
+              divider={index !== transactions.length - 1}
+              sx={{
+                px: 0,
+                py: 2,
+                '&:hover': { bgcolor: alpha('#fff', 0.02) },
+              }}
+            >
+              <ListItemIcon>
+                <Avatar
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    bgcolor: 
+                      transaction.type === 'buy' ? alpha('#4caf50', 0.1) : 
+                      transaction.type === 'sell' ? alpha('#f44336', 0.1) : 
+                      alpha('#00ffa3', 0.1),
+                    color: 
+                      transaction.type === 'buy' ? '#4caf50' : 
+                      transaction.type === 'sell' ? '#f44336' : 
+                      '#00ffa3',
+                    '& .MuiSvgIcon-root': { fontSize: '2rem' }
+                  }}
+                >
+                  {transaction.type === 'buy' && <ArrowUpIcon />}
+                  {transaction.type === 'sell' && <ArrowDownIcon />}
+                  {transaction.type === 'swap' && <SwapIcon />}
+                </Avatar>
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography variant="body1" fontWeight={600}>
+                    {transaction.type === 'swap'
+                      ? `Swap ${transaction.from} to ${transaction.to}`
+                      : `${transaction.type === 'buy' ? 'Bought' : 'Sold'} ${transaction.crypto}`}
+                  </Typography>
+                }
+                secondary={transaction.date}
+              />
+              <Box sx={{ textAlign: 'right' }}>
+                <Typography variant="body1" fontWeight={700}>
+                  {transaction.type !== 'swap' && `${transaction.amount} ${transaction.crypto}`}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {transaction.type !== 'swap' && `$${(transaction.amount * transaction.price).toLocaleString()}`}
+                </Typography>
+              </Box>
+            </ListItem>
+          ))}
+        </List>
+      </CardContent>
+    </Card>
   );
 };
 

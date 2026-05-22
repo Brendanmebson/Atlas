@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Box, CircularProgress, Typography } from '@mui/material';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
@@ -7,29 +8,26 @@ interface LoadingSpinnerProps {
 }
 
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size = 'md', text }) => {
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12'
+  const sizeMap = {
+    sm: 20,
+    md: 40,
+    lg: 60
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-8">
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        className={`border-4 border-blue-200 border-t-blue-500 rounded-full ${sizeClasses[size]}`}
-      />
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 4 }}>
+      <CircularProgress size={sizeMap[size]} color="primary" />
       {text && (
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mt-4 text-gray-600 dark:text-gray-400 text-sm"
         >
-          {text}
-        </motion.p>
+          <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
+            {text}
+          </Typography>
+        </motion.div>
       )}
-    </div>
+    </Box>
   );
 };
 

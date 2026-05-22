@@ -1,64 +1,74 @@
 import React from 'react';
-import { FaUserLock, FaLock, FaShieldAlt, FaBell, FaMobileAlt, FaChevronRight } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import {
+  Box,
+  Typography,
+  Stack,
+  alpha,
+  useTheme as useMuiTheme,
+} from '@mui/material';
+import {
+  AdminPanelSettings as UserLockIcon,
+  Lock as LockIcon,
+  Security as ShieldIcon,
+  PhonelinkSetup as MobileAltIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
 
 const Securitysettings: React.FC = () => {
+  const muiTheme = useMuiTheme();
+
+  const settings = [
+    { icon: <UserLockIcon />, title: 'Change PIN', description: 'Create and change your PIN seamlessly', color: '#00ffa3' },
+    { icon: <LockIcon />, title: 'Change Password', description: 'Create and change your password seamlessly', color: '#3B82F6' },
+    { icon: <ShieldIcon />, title: '2-Factor Authentication', description: 'Further secure your account and funds', color: '#8B5CF6' },
+    { icon: <MobileAltIcon />, title: 'Device Management', description: 'Manage devices connected to your account', color: '#F7931A' },
+  ];
+
   return (
-    <div className="container mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Security</h2>
-
-          <div className="space-y-6">
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaUserLock className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Change PIN</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Create and change your PIN seamlessly</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaLock className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Change Password</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Create and change your password seamlessly</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaShieldAlt className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">2-Factor Authentication</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Further secure your account and funds</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-           
-
-            <div className="group flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:bg-green-500 hover:text-white">
-              <div className="flex items-center space-x-4">
-                <FaMobileAlt className="text-2xl text-gray-600 group-hover:text-white" />
-                <div>
-                  <h3 className="text-lg font-semibold group-hover:text-white">Device Management</h3>
-                  <p className="text-sm text-gray-500 group-hover:text-white">Manage devices connected to your account</p>
-                </div>
-              </div>
-              <FaChevronRight className="text-gray-400 group-hover:text-white" />
-            </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      <Typography variant="h6" sx={{ fontWeight: 800, mb: 4 }}>Security Settings</Typography>
+      <Stack spacing={2}>
+        {settings.map((item) => (
+          <Box
+            key={item.title}
+            sx={{
+              p: 2.5,
+              borderRadius: 4,
+              cursor: 'pointer',
+              bgcolor: 'white',
+              border: '1px solid rgba(0,0,0,0.04)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.02)',
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.05)',
+                borderColor: alpha(item.color, 0.2),
+                bgcolor: alpha(item.color, 0.01)
+              }
+            }}
+          >
+            <Box sx={{ 
+                p: 1.5, 
+                borderRadius: 2.5, 
+                bgcolor: alpha(item.color, 0.1), 
+                color: item.color,
+                mr: 3,
+                display: 'flex'
+            }}>
+              {React.cloneElement(item.icon as React.ReactElement, { fontSize: 'medium' })}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{item.title}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>{item.description}</Typography>
+            </Box>
+            <ChevronRightIcon sx={{ color: 'text.disabled' }} />
+          </Box>
+        ))}
+      </Stack>
+    </motion.div>
   );
 };
 

@@ -1,79 +1,114 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import Balance from '../components/Balance/Balance';
-import QuickActions from '../components/QuickActions/QuickActions';
-import MarketOverview from '../components/Market/MarketOverview';
-import PortfolioSummary from '../components/Portfolio/PortfolioSummary';
-import TrendingCoins from '../components/Market/TrendingCoins';
-import RecentTransactions from '../components/Transactions/RecentTransactions';
-import PriceAlerts from '../components/Alerts/PriceAlerts';
-import NewsWidget from '../components/News/NewsWidget';
+import React from 'react';
+import { Box, Stack } from '@mui/material';
+import DashboardHeader from '../components/Dashboard/DashboardHeader';
+import PriceChart from '../components/Dashboard/PriceChart';
+import CoinCards from '../components/Dashboard/CoinCards';
+import WorldChat from '../components/Dashboard/WorldChat';
+import RightSidebar from '../components/Dashboard/RightSidebar';
+import QuickActions from '../components/QuickActions';
+import TrendingCryptos from '../components/TrendingCryptos';
+import Banners from '../components/Banners';
+import MarketOverview from '../components/MarketOverview';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useCrypto } from '../contexts/CryptoContext';
-import { useTheme } from '../contexts/ThemeContext';
 
 const Dashboard: React.FC = () => {
   const { loading, error } = useCrypto();
-  const { isDark } = useTheme();
-  const [activeView, setActiveView] = useState<'overview' | 'trading' | 'analytics'>('overview');
+  const [currentTab, setCurrentTab] = React.useState(0);
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <div className="text-center text-red-500 p-8">Error: {error}</div>;
-
+  
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
-      >
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Welcome to CryptoDash
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Your comprehensive cryptocurrency trading platform
-          </p>
-        </div>
-        
-        <div className="flex gap-2">
-          {(['overview', 'trading', 'analytics'] as const).map((view) => (
-            <button
-              key={view}
-              onClick={() => setActiveView(view)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                activeView === view
-                  ? 'bg-blue-500 text-white shadow-lg'
-                  : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
-              }`}
-            >
-              {view.charAt(0).toUpperCase() + view.slice(1)}
-            </button>
-          ))}
-        </div>
-      </motion.div>
+    <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: { xs: 'column', lg: 'row' }, 
+        gap: 3 
+      }}>
+        {/* Main Content Area */}
+        <Box sx={{ 
+          flex: 1,
+          width: '100%',
+          minWidth: 0 // Prevents flex children from overflowing
+        }}>
+          <Stack spacing={3}>
+            <DashboardHeader activeTab={currentTab} onTabChange={setCurrentTab} />
+            
+            {currentTab === 0 && (
+              <>
+                <Box sx={{ mb: 1 }}>
+                    <PriceChart />
+                </Box>
+                
+                <Box sx={{ mt: 2 }}>
+                    <CoinCards />
+                </Box>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Left Column */}
-        <div className="xl:col-span-2 space-y-6">
-          <Balance />
-          <QuickActions />
-          <MarketOverview />
-          {activeView === 'overview' && <PortfolioSummary />}
-          {activeView === 'trading' && <TrendingCoins />}
-          {activeView === 'analytics' && <div>Analytics View Coming Soon</div>}
-        </div>
+                <Box sx={{ mt: 2 }}>
+                    <Banners />
+                </Box>
+                <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: { xs: 'column', md: 'row' }, 
+                    gap: 3, 
+                    mt: 1,
+                    width: { 
+                        xs: '100%', 
+                        lg: 'calc(100% + 360px + 24px)',
+                        xl: 'calc(100% + 380px + 24px)'
+                    },
+                    zIndex: 10,
+                    position: 'relative'
+                }}>
+                    <Box sx={{ flex: { md: 1 } }}>
+                        <QuickActions />
+                    </Box>
+                    <Box sx={{ width: { md: '33.33%' } }}>
+                        <TrendingCryptos />
+                    </Box>
+                </Box>
+                <Box sx={{ 
+                    width: { 
+                        xs: '100%', 
+                        lg: 'calc(100% + 360px + 24px)',
+                        xl: 'calc(100% + 380px + 24px)'
+                    },
+                    zIndex: 10,
+                    position: 'relative'
+                }}>
+                    <WorldChat />
+                </Box>
+              </>
+            )}
 
-        {/* Right Sidebar */}
-        <div className="space-y-6">
-          <PriceAlerts />
-          <RecentTransactions />
-          <NewsWidget />
-        </div>
-      </div>
-    </div>
+            {currentTab === 1 && (
+              <>
+                <PriceChart />
+                <CoinCards />
+              </>
+            )}
+
+            {currentTab === 2 && (
+              <Box sx={{ width: '100%' }}>
+                <WorldChat />
+              </Box>
+            )}
+
+            {currentTab === 3 && (
+              <MarketOverview />
+            )}
+          </Stack>
+        </Box>
+
+        {/* Right Sidebar Area */}
+        <Box sx={{ 
+          width: { xs: '100%', lg: '360px', xl: '380px' },
+          flexShrink: 0
+        }}>
+          <RightSidebar />
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

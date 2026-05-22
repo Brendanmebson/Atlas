@@ -1,42 +1,136 @@
-// src/components/Navbar.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaUser } from 'react-icons/fa';
+import { Link as RouterLink } from 'react-router-dom';
+import { useTheme } from '../contexts/ThemeContext';
+import atlasDarkLogo from '../assets/atlas-dark.png';
+import atlasWhiteLogo from '../assets/atlas-white.png';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  Box,
+  Avatar,
+  Stack,
+  Container,
+  alpha,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
+import {
+  AccountCircle as UserIcon,
+  Logout as LogoutIcon,
+  Settings as SettingsIcon,
+} from '@mui/icons-material';
 
 const Navbarsettings: React.FC = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { isDark } = useTheme();
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center py-4">
-          <div className="flex items-center">
-            <Link to="/">
-              <img src="/src/assets/react.svg" alt="Logo" className="h-8 w-auto" />
-            </Link>
-          </div>
-          <div className="relative">
-            <button
-              className="flex items-center space-x-2"
-              onClick={() => setShowDropdown(!showDropdown)}
+    <AppBar 
+      position="static" 
+      color="default" 
+      elevation={0}
+      sx={{ 
+        bgcolor: 'background.paper', 
+        borderBottom: '1px solid', 
+        borderColor: 'divider' 
+      }}
+    >
+      <Container maxWidth="xl">
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
+          <Box component={RouterLink} to="/" sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            <Box 
+              component="img"
+              src={isDark ? atlasWhiteLogo : atlasDarkLogo}
+              alt="Atlas Logo"
+              sx={{ height: 32, width: 'auto' }}
+            />
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{
+                ml: 2,
+                fontWeight: 800,
+                color: 'success.main',
+                letterSpacing: '.1rem',
+              }}
             >
-                <FaUser className="text-gray-700" />
-                <span className="text-gray-700">Hello, John Doe</span>
-            </button>
-            {showDropdown && (
-              <div className="absolute right-0 mt-2 ml-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                <Link to="/Profilesettings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Profile Settings
-                </Link>
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  Logout
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </nav>
+              ATLAS
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Stack 
+              direction="row" 
+              spacing={2} 
+              alignItems="center" 
+              onClick={handleMenu}
+              sx={{ 
+                cursor: 'pointer',
+                p: 0.5,
+                pr: 2,
+                borderRadius: 2,
+                transition: 'all 0.2s',
+                '&:hover': { bgcolor: alpha('#4caf50', 0.08) }
+              }}
+            >
+              <Avatar sx={{ bgcolor: 'success.main' }}>
+                <UserIcon />
+              </Avatar>
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <Typography variant="body2" fontWeight={700}>John Doe</Typography>
+                <Typography variant="caption" color="text.secondary">Premium Member</Typography>
+              </Box>
+            </Stack>
+
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+              PaperProps={{
+                sx: {
+                  mt: 1.5,
+                  borderRadius: 2,
+                  minWidth: 200,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                }
+              }}
+            >
+              <MenuItem 
+                component={RouterLink} 
+                to="/Profilesettings" 
+                onClick={handleClose}
+                sx={{ py: 1.5 }}
+              >
+                <ListItemIcon>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Profile Settings" />
+              </MenuItem>
+              <MenuItem onClick={handleClose} sx={{ py: 1.5, color: 'error.main' }}>
+                <ListItemIcon>
+                  <LogoutIcon fontSize="small" color="error" />
+                </ListItemIcon>
+                <ListItemText primary="Logout" />
+              </MenuItem>
+            </Menu>
+          </Box>
+        </Toolbar>
+      </Container>
+    </AppBar>
   );
 };
 

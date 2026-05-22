@@ -1,190 +1,382 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FaHome, FaWallet, FaChartLine, FaUser, FaCog, 
-  FaBell, FaSearch, FaMoon, FaSun, FaDesktop 
-} from 'react-icons/fa';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  IconButton,
+  Box,
+  Container,
+  InputBase,
+  Badge,
+  Menu,
+  MenuItem,
+  Avatar,
+  Divider,
+} from '@mui/material';
+import { styled, alpha } from '@mui/material/styles';
+import {
+  Search as SearchIcon,
+  Notifications as NotificationsIcon,
+  MoreVert as MoreIcon,
+  Dashboard as DashboardIcon,
+  AccountBalanceWallet as WalletIcon,
+  BarChart as ChartIcon,
+  Settings as SettingsIcon,
+  Person as PersonIcon,
+  ExitToApp as LogoutIcon,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
+  Computer as ComputerIcon,
+} from '@mui/icons-material';
 import { useTheme } from '../contexts/ThemeContext';
 import { useCrypto } from '../contexts/CryptoContext';
+import atlasDarkLogo from '../assets/atlas-dark.png';
+import atlasWhiteLogo from '../assets/atlas-white.png';
+
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  itemsCenter: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
+      },
+    },
+  },
+}));
 
 const Navbar: React.FC = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState<null | HTMLElement>(null);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { theme, setTheme } = useTheme();
+  const { theme: currentTheme, setTheme, isDark } = useTheme();
   const { searchCoins } = useCrypto();
   const location = useLocation();
 
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
+
+  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
+
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: FaHome },
-    { name: 'Portfolio', href: '/portfolio', icon: FaWallet },
-    { name: 'Markets', href: '/markets', icon: FaChartLine },
+    { name: 'Dashboard', href: '/dashboard', icon: <DashboardIcon /> },
+    { name: 'Portfolio', href: '/portfolio', icon: <WalletIcon /> },
+    { name: 'Markets', href: '/markets', icon: <ChartIcon /> },
   ];
 
   const themeIcons = {
-    light: FaSun,
-    dark: FaMoon,
-    system: FaDesktop
+    light: <LightModeIcon />,
+    dark: <DarkModeIcon />,
+    system: <ComputerIcon />
   };
 
   const searchResults = searchQuery ? searchCoins(searchQuery).slice(0, 5) : [];
 
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id="primary-search-account-menu"
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+      PaperProps={{
+        sx: {
+          mt: 5,
+          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+          border: '1px solid ' + alpha('#fff', 0.1),
+        }
+      }}
+    >
+      <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
+        <IconButton size="small" sx={{ mr: 1 }}><PersonIcon /></IconButton>
+        Profile
+      </MenuItem>
+      <MenuItem onClick={handleMenuClose} component={Link} to="/settings">
+        <IconButton size="small" sx={{ mr: 1 }}><SettingsIcon /></IconButton>
+        Settings
+      </MenuItem>
+      <Divider />
+      <MenuItem onClick={() => { handleMenuClose(); alert('Logged out successfully!'); window.location.href = '/'; }} sx={{ color: 'error.main' }}>
+        <IconButton size="small" sx={{ mr: 1, color: 'error.main' }}><LogoutIcon /></IconButton>
+        Logout
+      </MenuItem>
+    </Menu>
+  );
+
+  const renderMobileMenu = (
+    <Menu
+      anchorEl={mobileMoreAnchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id="primary-search-account-menu-mobile"
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMobileMenuOpen}
+      onClose={handleMobileMenuClose}
+    >
+      <MenuItem>
+        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <Badge badgeContent={4} color="error">
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+        <p>Notifications</p>
+      </MenuItem>
+      <MenuItem onClick={handleProfileMenuOpen}>
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <PersonIcon />
+        </IconButton>
+        <p>Profile</p>
+      </MenuItem>
+    </Menu>
+  );
+
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-slate-700">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">CD</span>
-            </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              CryptoDash
-            </span>
-          </Link>
-
-          {/* Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.href;
-              
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
-                    isActive
-                      ? 'bg-blue-500 text-white shadow-lg'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="font-medium">{item.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Right Side */}
-          <div className="flex items-center space-x-2">
-            {/* Search */}
-            <div className="relative">
-              <button
-                onClick={() => setShowSearch(!showSearch)}
-                className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
-              >
-                <FaSearch className="w-4 h-4" />
-              </button>
-              
-              <AnimatePresence>
-                {showSearch && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 p-4"
-                  >
-                    <input
-                      type="text"
-                      placeholder="Search cryptocurrencies..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full p-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-transparent"
-                      autoFocus
-                    />
-                    
-                    {searchResults.length > 0 && (
-                      <div className="mt-2 space-y-1">
-                        {searchResults.map((coin) => (
-                          <div
-                            key={coin.id}
-                            className="flex items-center space-x-3 p-2 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg cursor-pointer"
-                          >
-                            <img src={coin.image} alt={coin.name} className="w-6 h-6" />
-                            <div>
-                              <div className="font-medium">{coin.name}</div>
-                              <div className="text-sm text-gray-500">{coin.symbol.toUpperCase()}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Theme Toggle */}
-            <button
-              onClick={() => {
-                const themes = ['light', 'dark', 'system'] as const;
-                const currentIndex = themes.indexOf(theme);
-                const nextTheme = themes[(currentIndex + 1) % themes.length];
-                setTheme(nextTheme);
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="sticky">
+        <Container maxWidth={false}>
+          <Toolbar disableGutters>
+            {/* Logo */}
+            <Typography
+              variant="h6"
+              noWrap
+              component={Link}
+              to="/"
+              sx={{
+                mr: 2,
+                display: { xs: 'none', md: 'flex' },
+                fontFamily: 'Outfit',
+                fontWeight: 700,
+                letterSpacing: '.1rem',
+                color: 'inherit',
+                textDecoration: 'none',
+                alignItems: 'center',
+                gap: 1
               }}
-              className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800"
             >
-              {React.createElement(themeIcons[theme], { className: "w-4 h-4" })}
-            </button>
+              <Box 
+                component="img"
+                src={isDark ? atlasWhiteLogo : atlasDarkLogo}
+                alt="Atlas Logo"
+                sx={{ height: 32, width: 'auto' }}
+              />
+              <Box component="span" sx={{
+                background: 'linear-gradient(135deg, #00ffa3 0%, #ffffff 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                Atlas
+              </Box>
+            </Typography>
 
-            {/* Notifications */}
-            <button className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 relative">
-              <FaBell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-            </button>
+            {/* Navigation (Desktop) */}
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, ml: 4, gap: 1 }}>
+              {navigation.map((item) => (
+                <Button
+                  key={item.name}
+                  component={Link}
+                  to={item.href}
+                  startIcon={item.icon}
+                  sx={{
+                    my: 2,
+                    color: location.pathname === item.href ? 'primary.main' : 'text.secondary',
+                    display: 'flex',
+                    textTransform: 'none',
+                    px: 2,
+                    borderRadius: 2,
+                    backgroundColor: location.pathname === item.href ? alpha('#00ffa3', 0.1) : 'transparent',
+                    '&:hover': {
+                      backgroundColor: alpha('#00ffa3', 0.05),
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  {item.name}
+                </Button>
+              ))}
+            </Box>
 
-            {/* User Menu */}
-            <div className="relative">
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800"
+            {/* Search */}
+            <Box sx={{ mr: 2, display: { xs: 'none', sm: 'block' } }}>
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder="Search…"
+                  inputProps={{ 'aria-label': 'search' }}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </Search>
+            </Box>
+
+            {/* Right Side */}
+            <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <IconButton
+                size="large"
+                color="inherit"
+                onClick={() => {
+                  const themes = ['light', 'dark', 'system'] as const;
+                  const currentIndex = themes.indexOf(currentTheme);
+                  const nextTheme = themes[(currentIndex + 1) % themes.length];
+                  setTheme(nextTheme);
+                }}
               >
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <FaUser className="w-4 h-4 text-white" />
-                </div>
-                <span className="hidden sm:block text-gray-700 dark:text-gray-300 font-medium">
-                  John Doe
-                </span>
-              </button>
+                {themeIcons[currentTheme]}
+              </IconButton>
 
-              <AnimatePresence>
-                {showDropdown && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 py-2"
-                  >
-                    <Link
-                      to="/profile"
-                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700"
-                      onClick={() => setShowDropdown(false)}
-                    >
-                      <FaUser className="w-4 h-4" />
-                      <span>Profile</span>
-                    </Link>
-                    <Link
-                      to="/settings"
-                      className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700"
-                      onClick={() => setShowDropdown(false)}
-                    >
-                      <FaCog className="w-4 h-4" />
-                      <span>Settings</span>
-                    </Link>
-                    <hr className="my-2 border-gray-200 dark:border-slate-700" />
-                    <button className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left">
-                      <span>Logout</span>
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
-      </div>
-    </nav>
+              <IconButton size="large" color="inherit">
+                <Badge badgeContent={4} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+
+              <IconButton
+                size="large"
+                edge="end"
+                aria-label="account of current user"
+                aria-controls="primary-search-account-menu"
+                aria-haspopup="true"
+                onClick={handleProfileMenuOpen}
+                color="inherit"
+              >
+                <Avatar sx={{ 
+                  width: 32, 
+                  height: 32, 
+                  background: 'linear-gradient(135deg, #00ffa3 0%, #00d1ff 100%)' 
+                }}>
+                  <PersonIcon sx={{ fontSize: 20 }} />
+                </Avatar>
+              </IconButton>
+            </Box>
+
+            {/* Mobile More Icon */}
+            <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+              <IconButton
+                size="large"
+                aria-label="show more"
+                aria-controls="primary-search-account-menu-mobile"
+                aria-haspopup="true"
+                onClick={handleMobileMenuOpen}
+                color="inherit"
+              >
+                <MoreIcon />
+              </IconButton>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+      {renderMobileMenu}
+      {renderMenu}
+      
+      {/* Search Dropdown (Simplified for MUI) */}
+      <AnimatePresence>
+        {searchQuery && searchResults.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              position: 'absolute',
+              top: '70px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1000,
+              width: '100%',
+              maxWidth: '400px',
+            }}
+          >
+            <Box sx={{ 
+              bgcolor: 'background.paper', 
+              borderRadius: 2, 
+              boxShadow: 24, 
+              border: '1px solid ' + alpha('#fff', 0.1),
+              p: 1 
+            }}>
+              {searchResults.map((coin) => (
+                <MenuItem key={coin.id} sx={{ borderRadius: 1 }}>
+                  <Box component="img" src={coin.image} alt={coin.name} sx={{ width: 24, height: 24, mr: 2 }} />
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{coin.name}</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>{coin.symbol.toUpperCase()}</Typography>
+                  </Box>
+                </MenuItem>
+              ))}
+            </Box>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Box>
   );
 };
 

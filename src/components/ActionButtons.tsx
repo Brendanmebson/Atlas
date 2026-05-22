@@ -1,6 +1,11 @@
 // components/ActionButtons.tsx
 import React, { useState } from 'react';
-import { FaShoppingCart, FaExchangeAlt, FaCoins } from 'react-icons/fa';
+import { Button, Box } from '@mui/material';
+import {
+  ShoppingCart as ShoppingCartIcon,
+  SwapHoriz as SwapIcon,
+  CurrencyExchange as ExchangeIcon,
+} from '@mui/icons-material';
 import CryptoActionModal from './CryptoActionModal';
 
 const ActionButtons: React.FC = () => {
@@ -13,34 +18,87 @@ const ActionButtons: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="flex justify-center space-x-4 mb-8">
-        <button
+    <Box sx={{ mb: 4 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 2,
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="success"
+          size="large"
+          startIcon={<ShoppingCartIcon />}
           onClick={() => openModal('buy')}
-          className="bg-white hover:bg-green-600 border-2 border-green-600  text-green-600 hover:text-white font-bold py-4 px-8 rounded-full flex items-center transition duration-300"
+          sx={{
+            py: 1.5,
+            px: 4,
+            borderRadius: 10,
+            borderWidth: 2,
+            fontWeight: 'bold',
+            '&:hover': {
+              borderWidth: 2,
+              backgroundColor: 'success.main',
+              color: 'white',
+            },
+          }}
         >
-          <FaShoppingCart className="mr-2" /> Buy
-        </button>
-        <button
+          Buy
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          size="large"
+          startIcon={<ExchangeIcon />}
           onClick={() => openModal('sell')}
-          className="bg-white hover:bg-red-600 border-2 border-red-600  text-red-600 hover:text-white font-bold py-4 px-8 rounded-full flex items-center transition duration-300"
+          sx={{
+            py: 1.5,
+            px: 4,
+            borderRadius: 10,
+            borderWidth: 2,
+            fontWeight: 'bold',
+            '&:hover': {
+              borderWidth: 2,
+              backgroundColor: 'error.main',
+              color: 'white',
+            },
+          }}
         >
-          <FaCoins className="mr-2" /> Sell
-        </button>
-        <button
+          Sell
+        </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          size="large"
+          startIcon={<SwapIcon />}
           onClick={() => openModal('swap')}
-          className="bg-white hover:bg-blue-600 border-2 border-blue-600  text-blue-600 hover:text-white font-bold py-4 px-8 rounded-full flex items-center transition duration-300"
+          sx={{
+            py: 1.5,
+            px: 4,
+            borderRadius: 10,
+            borderWidth: 2,
+            fontWeight: 'bold',
+            '&:hover': {
+              borderWidth: 2,
+              backgroundColor: 'primary.main',
+              color: 'white',
+            },
+          }}
         >
-          <FaExchangeAlt className="mr-2" /> Swap
-        </button>
-      </div>
+          Swap
+        </Button>
+      </Box>
       {modalOpen && selectedAction && (
         <CryptoActionModal
           initialAction={selectedAction}
           onClose={() => setModalOpen(false)}
         />
       )}
-    </>
+    </Box>
   );
 };
 
