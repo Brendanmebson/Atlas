@@ -4,6 +4,12 @@ import { useTheme } from '../contexts/ThemeContext';
 import atlasDarkLogo from '../assets/atlas-dark.png';
 
 import {
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Typography,
   Badge,
   Drawer,
@@ -38,8 +44,8 @@ const menuItems: MenuItem[] = [
 
 
 interface SidebarProps {
-  mobileOpen: boolean;
-  onClose: () => void;
+  mobileOpen?: boolean;
+  onClose?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
@@ -52,18 +58,18 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
     return location.pathname === path;
   };
 
-  const handleNavigation = (path: string) => {
+  const handleNav = (path: string) => {
     navigate(path);
-    onClose();
+    if (onClose) onClose();
   };
 
-  const drawerContent = (
+  const sidebarContent = (
     <Box sx={{
       height: '100%',
-      bgcolor: 'transparent',
       display: 'flex',
       flexDirection: 'column',
       p: 3,
+      bgcolor: 'transparent',
     }}>
       {/* Logo */}
       <Box sx={{ display: 'flex', alignItems: 'center', mt: 1, mb: 3, pl: 1 }}>
@@ -73,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
           alt="Atlas Logo"
           sx={{ height: 40, width: 'auto', mr: 1.5 }}
         />
-        <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary' }}>
+        <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', letterSpacing: -0.5 }}>
           Atlas
         </Typography>
       </Box>
@@ -83,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
             <ListItemButton
-              onClick={() => handleNavigation(item.path)}
+              onClick={() => handleNav(item.path)}
               sx={{
                 borderRadius: 2,
                 py: 1.2,
@@ -113,15 +119,6 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
                   fontSize: '0.9rem'
                 }}
               />
-              {isActive(item.path) && (
-                <Box sx={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  bgcolor: 'white',
-                  ml: 1
-                }} />
-              )}
             </ListItemButton>
           </ListItem>
         ))}
@@ -131,50 +128,39 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onClose }) => {
 
   return (
     <>
-      <Box
-        component="nav"
-        sx={{ width: { md: 240 }, flexShrink: { md: 0 } }}
-      >
-        {/* Mobile Drawer */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={onClose}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: 240,
-              bgcolor: 'background.default',
-              backgroundImage: 'none',
-              borderRight: '1px solid rgba(0,0,0,0.05)',
-            },
-          }}
-        >
-          {drawerContent}
-        </Drawer>
-
-        {/* Desktop Sidebar (Permanent) */}
-        <Box
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            width: 240,
-            height: '100vh',
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            borderRight: '1px solid rgba(0,0,0,0.05)',
-            bgcolor: 'transparent',
-            backdropFilter: 'blur(10px)',
-            zIndex: 1100,
-          }}
-        >
-          {drawerContent}
-        </Box>
+      {/* Desktop Sidebar */}
+      <Box sx={{
+        display: { xs: 'none', md: 'flex' },
+        width: 240,
+        height: '100vh',
+        borderRight: '1px solid rgba(0,0,0,0.05)',
+        backdropFilter: 'blur(10px)',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        zIndex: 1200,
+      }}>
+        {sidebarContent}
       </Box>
+
+      {/* Mobile Drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': { 
+            boxSizing: 'border-box', 
+            width: 240,
+            bgcolor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(20px)',
+          },
+        }}
+      >
+        {sidebarContent}
+      </Drawer>
     </>
   );
 };

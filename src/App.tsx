@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Box, AppBar, Toolbar, IconButton, Typography } from '@mui/material';
+import { Menu as MenuIcon } from '@mui/icons-material';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { CryptoProvider } from './contexts/CryptoContext';
 import { PortfolioProvider } from './contexts/PortfolioContext';
@@ -17,8 +18,8 @@ import Exchange from './pages/Exchange';
 import './styles/animations.css';
 
 import bgImage from './assets/background.jpg';
+import atlasWhiteLogo from './assets/atlas-white.png';
 import Sidebar from './components/Sidebar';
-import Navbar from './components/Header/Navbar';
 
 const App: React.FC = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -49,15 +50,50 @@ const App: React.FC = () => {
               zIndex: 0,
             }
           }}>
-            <Navbar onMenuClick={handleDrawerToggle} />
-            <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
+            {/* Mobile Header */}
+            <AppBar 
+              position="fixed" 
+              sx={{ 
+                display: { md: 'none' },
+                bgcolor: 'rgba(255, 255, 255, 0.8)',
+                backdropFilter: 'blur(20px)',
+                boxShadow: 'none',
+                borderBottom: '1px solid rgba(0,0,0,0.05)',
+                zIndex: 1100
+              }}
+            >
+              <Toolbar>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 2, color: 'text.primary' }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Box
+                    component="img"
+                    src={atlasWhiteLogo}
+                    alt="Atlas"
+                    sx={{ height: 28, width: 'auto', mr: 1, filter: 'invert(0)' }}
+                  />
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                    Atlas
+                  </Typography>
+                </Box>
+              </Toolbar>
+            </AppBar>
+
+            <Sidebar mobileOpen={mobileOpen} onClose={handleDrawerToggle} />
             
             <Box component="main" sx={{
               flexGrow: 1,
               ml: { xs: 0, md: '240px' },
               mt: { xs: '64px', md: 0 },
               minHeight: '100vh',
-              p: { xs: 2, md: 2.5 },
+              p: { xs: 2, sm: 2.5 },
               overflow: 'hidden',
               position: 'relative',
               zIndex: 1,

@@ -1,4 +1,4 @@
-# <img src="./public/atlas-white.png" width="40" height="40" align="center" /> Atlas | The Future of Finance
+# <img src="./public/atlas-light.png" width="40" height="40" align="center" /> Atlas | The Future of Finance
 
 **Atlas** is a premium cryptocurrency dashboard designed for the modern investor. Formerly known as CryptoDash, Atlas provides a high-fidelity, real-time interface for tracking market trends, managing portfolios, and executing trades with a sophisticated "soft-light" and glass-morphism aesthetic.
 

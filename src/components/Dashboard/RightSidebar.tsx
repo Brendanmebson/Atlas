@@ -38,7 +38,7 @@ const RightSidebar: React.FC = () => {
       {/* My Items */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" sx={{ fontWeight: 800, mb: 3 }}>My items</Typography>
-        <Box sx={{ display: 'flex', gap: 1.5 }}>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5 }}>
           <Box sx={{ flex: 1 }}>
             <Paper sx={{ p: 2, borderRadius: 2, bgcolor: '#fdf2f8', boxShadow: 'none' }}>
               <Box sx={{ mb: 1, color: 'secondary.main' }}>⚡</Box>

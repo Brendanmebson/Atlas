@@ -298,9 +298,9 @@ const Portfolio: React.FC = () => {
             <TableHead>
               <TableRow sx={{ bgcolor: alpha('#000', 0.02) }}>
                 <TableCell sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>Asset</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>Holdings</TableCell>
+                <TableCell align="right" sx={{ display: { xs: 'none', sm: 'table-cell' }, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>Holdings</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>Value</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>24h Change</TableCell>
+                <TableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' }, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>24h Change</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.65rem', borderBottom: 'none' }}>Profit / Loss</TableCell>
               </TableRow>
             </TableHead>
@@ -336,7 +336,7 @@ const Portfolio: React.FC = () => {
                       </Box>
                     </Stack>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="right" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
                       {showValues ? asset.amount.toFixed(4) : '••••'}
                     </Typography>
@@ -349,7 +349,7 @@ const Portfolio: React.FC = () => {
                       {showValues ? formatCurrency(asset.value, currency) : '••••'}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                     <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.3, borderRadius: 1.5, bgcolor: alpha(asset.change_24h >= 0 ? '#00ffa3' : '#ff5252', 0.1) }}>
                       {asset.change_24h >= 0 ? <ArrowUpIcon sx={{ fontSize: 12, color: '#00b372' }} /> : <ArrowDownIcon sx={{ fontSize: 12, color: '#f44336' }} />}
                       <Typography variant="caption" sx={{ color: asset.change_24h >= 0 ? '#00b372' : '#f44336', fontWeight: 800 }}>

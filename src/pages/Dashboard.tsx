@@ -52,19 +52,27 @@ const Dashboard: React.FC = () => {
                     flexDirection: { xs: 'column', md: 'row' }, 
                     gap: 3, 
                     mt: 1,
-                    width: '100%',
+                    width: { 
+                        xs: '100%', 
+                        lg: 'calc(100% + 360px + 24px)',
+                        xl: 'calc(100% + 380px + 24px)'
+                    },
                     zIndex: 10,
                     position: 'relative'
                 }}>
-                    <Box sx={{ flex: { md: 1 } }}>
+                    <Box sx={{ flex: 1, width: '100%' }}>
                         <QuickActions />
                     </Box>
-                    <Box sx={{ width: { md: '33.33%' } }}>
+                    <Box sx={{ width: { xs: '100%', md: '33.33%' } }}>
                         <TrendingCryptos />
                     </Box>
                 </Box>
                 <Box sx={{ 
-                    width: '100%',
+                    width: { 
+                        xs: '100%', 
+                        lg: 'calc(100% + 360px + 24px)',
+                        xl: 'calc(100% + 380px + 24px)'
+                    },
                     zIndex: 10,
                     position: 'relative'
                 }}>
